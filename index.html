@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بستان الورد - متجر الورود والباقات</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
+    body { background: #fdfaf8; color: #2b2623; line-height: 1.6; }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #efe7e2;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand { font-size: 20px; font-weight: bold; color: #8c2f4a; }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .edit-toggle-btn {
+      background: #fff1f5;
+      color: #8c2f4a;
+      border: 1px solid #e3b8c6;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .edit-toggle-btn.active {
+      background: #2f6f4e;
+      color: #fff;
+      border-color: #2f6f4e;
+    }
+    .cart-badge {
+      background: #8c2f4a;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 75px 20px;
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(rgba(35, 16, 22, 0.45), rgba(35, 16, 22, 0.45)),
+                  url("images/hero-cover.jpg") center / contain no-repeat #f6e7ec;
+      color: #ffffff;
+    }
+    .hero h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    }
+    .hero p {
+      color: #fff5f8;
+      max-width: 650px;
+      margin: 0 auto;
+      font-size: 15px;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+    }
+
+    .editor-panel {
+      display: none;
+      max-width: 1150px;
+      margin: 18px auto 0;
+      padding: 16px;
+      background: #fff9eb;
+      border: 1px solid #f0d59c;
+      border-radius: 12px;
+    }
+    .editor-panel.show { display: block; }
+    .editor-panel h3 { font-size: 15px; color: #5c3d00; margin-bottom: 6px; }
+    .editor-panel p { font-size: 13px; color: #6e5219; margin-bottom: 10px; }
+    .panel-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .export-btn {
+      background: #8c2f4a;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .reset-btn {
+      background: #fff;
+      color: #5c3d00;
+      border: 1px solid #d8c298;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .export-box {
+      width: 100%;
+      min-height: 120px;
+      margin-top: 10px;
+      padding: 10px;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      direction: ltr;
+      text-align: left;
+      border-radius: 8px;
+      border: 1px solid #d8c298;
+      display: none;
+    }
+    .export-box.show { display: block; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 22px 16px 10px;
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+    .filter-btn {
+      border: 1px solid #d9c7ce;
+      background: #fff;
+      color: #4a353c;
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: #8c2f4a;
+      color: #fff;
+      border-color: #8c2f4a;
+    }
+
+    .grid {
+      max-width: 1150px;
+      margin: 20px auto 50px;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #efe7e2;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .card img {
+      width: 100%;
+      height: 195px;
+      object-fit: cover;
+      background: #f5ecee;
+    }
+    .card-body { padding: 13px; }
+    .category-tag {
+      display: inline-block;
+      font-size: 11px;
+      background: #fcebf0;
+      color: #8c2f4a;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+    .card-title { font-size: 15px; font-weight: bold; margin-bottom: 3px; }
+    .card-en { font-size: 12px; color: #7a6f6a; margin-bottom: 6px; }
+    .price { font-size: 14px; font-weight: bold; color: #2f6f4e; margin-bottom: 10px; }
+
+    .edit-controls {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #e3cfd6;
+      gap: 6px;
+      flex-direction: column;
+    }
+    .edit-controls.show { display: flex; }
+    .edit-controls label { font-size: 11px; color: #6e5219; font-weight: bold; }
+    .edit-controls input, .edit-controls select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #d5c4ca;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .add-btn {
+      width: 100%;
+      background: #2b2623;
+      color: #fff;
+      border: none;
+      padding: 9px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .add-btn:hover { background: #8c2f4a; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #2b2623;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">بستان الورد</div>
+    <div class="header-actions">
+      <button class="edit-toggle-btn" id="editToggleBtn" onclick="toggleEditMode()">تعديل الأسماء والصور</button>
+      <div class="cart-badge" id="cartCount">السلة (0)</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>تشكيلة واسعة من الورود وأوراق الزينة</h1>
+    <p>تصفحي 50 نوعاً مختاراً بعناية من الورود والزهور وأوراق التنسيق، وفلترِي حسب الفئة بضغطة واحدة.</p>
+  </section>
+
+  <div class="editor-panel" id="editorPanel">
+    <h3>وضع التعديل المباشر للأسماء والصور</h3>
+    <p>أي اسم أو صورة بتعدليها هنا بتتحفظ فوراً في المتصفح، ولما تخلصي تقدري تضغطي "تصدير الكود الجاهز" لنسخه في <code>index.html</code>.</p>
+    <div class="panel-btns">
+      <button class="export-btn" onclick="exportUpdatedData()">تصدير الكود الجاهز</button>
+      <button class="reset-btn" onclick="resetSavedEdits()">استعادة الافتراضي</button>
+    </div>
+    <textarea class="export-box" id="exportBox" readonly></textarea>
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <main class="grid" id="flowersGrid"></main>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const IMG_DIR = "images/";
+    const STORAGE_KEY = "bastan_alward_flowers_v1";
+    const POSSIBLE_STAMPS = [
+      "2026-11-20_23-53-35",
+      "2026-11-20_23-53-36",
+      "2026-11-20_23-43-41",
+      "2026-11-20_23-57-57"
+    ];
+
+    const rawItems = [
+      ["الورد الجوري الأحمر", "Red Garden Rose", "ورود كلاسيكية", 350, 1],
+      ["الورد الجوري الوردي", "Pink Garden Rose", "ورود كلاسيكية", 340, 2],
+      ["الورد الجوري الأبيض", "White Rose", "ورود كلاسيكية", 360, 3],
+      ["الورد القزمي (بيبي روز)", "Spray Rose", "ورود كلاسيكية", 320, 4],
+      ["زهرة التوليب", "Tulip", "زهور الربيع", 420, 5],
+      ["زهرة عباد الشمس", "Sunflower", "زهور مميزة", 300, 6],
+      ["زهرة الفاوانيا (البيوني)", "Peony", "زهور الربيع", 480, 7],
+      ["زهرة الأوركيد", "Phalaenopsis Orchid", "زهور فاخرة", 520, 8],
+      ["زهرة الليلي الأبيض", "White Oriental Lily", "زهور فاخرة", 410, 9],
+      ["زهرة القرنفل", "Carnation", "ورود كلاسيكية", 260, 10],
+      ["زهرة الحوذان", "Ranunculus", "زهور الربيع", 390, 11],
+      ["زهرة الليزيانثوس", "Lisianthus", "زهور ناعمة", 330, 12],
+      ["زهرة الهيدرانجيا", "Hydrangea", "زهور فاخرة", 450, 13],
+      ["زهرة الكالا ليلي", "Calla Lily", "زهور فاخرة", 440, 14],
+      ["شقائق النعمان", "Anemone", "زهور الربيع", 370, 15],
+      ["زهرة الداليا", "Dahlia", "زهور مميزة", 380, 16],
+      ["زهرة البروتيا الملكية", "King Protea", "زهور مميزة", 490, 17],
+      ["زهرة الأمارلس", "Amaryllis", "زهور مميزة", 400, 18],
+      ["زهرة الكاميليا", "Camellia", "زهور ناعمة", 360, 19],
+      ["زهرة عصفور الجنة", "Bird of Paradise", "زهور مميزة", 430, 20],
+      ["زهرة الياسمين الأبيض", "White Jasmine", "زهور عطرية", 290, 21],
+      ["زهرة الفريزيا", "Freesia", "زهور عطرية", 340, 22],
+      ["زهرة الخزامى (اللافندر)", "Lavender", "زهور عطرية", 310, 23],
+      ["زنبق الوادي", "Lily of the Valley", "زهور ناعمة", 460, 24],
+      ["زهرة النرجس", "Daffodil / Narcissus", "زهور الربيع", 280, 25],
+      ["زهرة الصفير (الهياسنت)", "Hyacinth", "زهور عطرية", 350, 26],
+      ["زهرة السوسن", "Iris", "زهور الربيع", 330, 27],
+      ["زهرة البازلاء الحلوة", "Sweet Pea", "زهور عطرية", 320, 28],
+      ["زهرة الجاردينيا", "Gardenia", "زهور عطرية", 370, 29],
+      ["زهرة الليلك", "Lilac", "زهور عطرية", 360, 30],
+      ["الجيبسوفيلا (نفس الطفل)", "Baby's Breath", "زهور ناعمة", 240, 31],
+      ["زهرة الجربيرا", "Gerbera Daisy", "زهور برية وملونة", 270, 32],
+      ["زهرة الأقحوان", "Chrysanthemum", "زهور ناعمة", 260, 33],
+      ["زهرة الأستر", "Aster", "زهور برية وملونة", 270, 34],
+      ["زهرة الاستاتس", "Statice / Sea Lavender", "زهور برية وملونة", 250, 35],
+      ["زهرة الشمع", "Waxflower", "زهور ناعمة", 280, 36],
+      ["زهرة البوفارديا", "Bouvardia", "زهور ناعمة", 310, 37],
+      ["زهرة أنف العجل", "Snapdragon", "زهور برية وملونة", 290, 38],
+      ["زهرة العايق (الدلفينيوم)", "Delphinium", "زهور برية وملونة", 350, 39],
+      ["زهرة زينيا", "Zinnia", "زهور برية وملونة", 260, 40],
+      ["زهرة اللوتس", "Lotus", "زهور مميزة", 420, 41],
+      ["زهرة الكركديه (الهيبسكس)", "Hibiscus", "زهور برية وملونة", 270, 42],
+      ["زهرة البابونج", "Chamomile / Feverfew", "زهور ناعمة", 230, 43],
+      ["زهرة الخشخاش", "Poppy", "زهور برية وملونة", 300, 44],
+      ["زهرة الكوزموس", "Cosmos", "زهور برية وملونة", 260, 45],
+      ["زهرة الهيليبور (وردة الشتاء)", "Hellebore", "زهور الربيع", 380, 46],
+      ["أوراق الأوكالبتوس", "Eucalyptus", "أوراق زينة", 180, 47],
+      ["أوراق السرخس", "Fern", "أوراق زينة", 170, 48],
+      ["أوراق الرسكوس", "Ruscus", "أوراق زينة", 190, 49],
+      ["أوراق المونستيرا", "Monstera Leaf", "أوراق زينة", 210, 50]
+    ];
+
+    const categories = [
+      "الكل",
+      "ورود كلاسيكية",
+      "زهور الربيع",
+      "زهور فاخرة",
+      "زهور عطرية",
+      "زهور ناعمة",
+      "زهور برية وملونة",
+      "زهور مميزة",
+      "أوراق زينة"
+    ];
+
+    function getCandidates(photoNum) {
+      const candidates = [];
+      POSSIBLE_STAMPS.forEach(stamp => {
+        candidates.push(`${IMG_DIR}photo_${photoNum}_${stamp}.jpg`);
+        candidates.push(`${IMG_DIR}photo_${photoNum}_${stamp}.jpeg`);
+        candidates.push(`${IMG_DIR}photo_${photoNum}_${stamp}.png`);
+      });
+      return candidates;
+    }
+
+    function buildInitialFlowers() {
+      return rawItems.map(([ar, en, category, price, photoNum], index) => {
+        const pNum = photoNum || (index + 1);
+        const candidates = getCandidates(pNum);
+        return {
+          id: index + 1,
+          ar,
+          en,
+          category,
+          price,
+          photoNum: pNum,
+          src: candidates[0],
+          candidates
+        };
+      });
+    }
+
+    function loadFlowers() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map(item => {
+              const pNum = parseInt(item.photoNum, 10) || 1;
+              const candidates = getCandidates(pNum);
+              return { ...item, photoNum: pNum, candidates, src: candidates[0] };
+            });
+          }
+        }
+      } catch (e) {}
+      return buildInitialFlowers();
+    }
+
+    let flowers = loadFlowers();
+    let selectedCategory = "الكل";
+    let cartCount = 0;
+    let editMode = false;
+
+    const filtersEl = document.getElementById("filters");
+    const gridEl = document.getElementById("flowersGrid");
+    const cartEl = document.getElementById("cartCount");
+    const toastEl = document.getElementById("toast");
+    const editorPanelEl = document.getElementById("editorPanel");
+    const editToggleBtnEl = document.getElementById("editToggleBtn");
+    const exportBoxEl = document.getElementById("exportBox");
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 1800);
+    }
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(flowers));
+      } catch (e) {}
+    }
+
+    function toggleEditMode() {
+      editMode = !editMode;
+      editToggleBtnEl.classList.toggle("active", editMode);
+      editToggleBtnEl.textContent = editMode ? "إنهاء التعديل" : "تعديل الأسماء والصور";
+      editorPanelEl.classList.toggle("show", editMode);
+      renderFlowers();
+    }
+
+    function updateFlowerName(id, newName) {
+      const item = flowers.find(f => f.id === id);
+      if (item) {
+        item.ar = newName;
+        saveToLocalStorage();
+        renderFlowers();
+      }
+    }
+
+    function updateFlowerPhoto(id, newPhotoNum) {
+      const item = flowers.find(f => f.id === id);
+      if (item) {
+        const pNum = parseInt(newPhotoNum, 10) || 1;
+        const candidates = getCandidates(pNum);
+        item.photoNum = pNum;
+        item.candidates = candidates;
+        item.src = candidates[0];
+        saveToLocalStorage();
+        renderFlowers();
+      }
+    }
+
+    function resetSavedEdits() {
+      localStorage.removeItem(STORAGE_KEY);
+      flowers = buildInitialFlowers();
+      renderFlowers();
+      showToast("تمت استعادة القائمة الافتراضية");
+    }
+
+    function exportUpdatedData() {
+      const lines = flowers.map(f => {
+        const safeAr = f.ar.replace(/"/g, '\\"');
+        const safeEn = f.en.replace(/"/g, '\\"');
+        return `      ["${safeAr}", "${safeEn}", "${f.category}", ${f.price}, ${f.photoNum}]`;
+      });
+      exportBoxEl.value = `const rawItems = [\n${lines.join(",\n")}\n    ];`;
+      exportBoxEl.classList.add("show");
+      exportBoxEl.select();
+      document.execCommand("copy");
+      showToast("تم نسخ الكود — الصقيه مكان rawItems في index.html واحفظي بـ Ctrl+S");
+    }
+
+    function handleImgError(imgEl) {
+      const list = JSON.parse(imgEl.dataset.candidates || "[]");
+      let idx = parseInt(imgEl.dataset.idx || "0", 10) + 1;
+      if (idx < list.length) {
+        imgEl.dataset.idx = String(idx);
+        imgEl.src = list[idx];
+      }
+    }
+
+    function renderFilters() {
+      filtersEl.innerHTML = "";
+      categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "filter-btn" + (cat === selectedCategory ? " active" : "");
+        btn.textContent = cat;
+        btn.onclick = () => {
+          selectedCategory = cat;
+          renderFilters();
+          renderFlowers();
+        };
+        filtersEl.appendChild(btn);
+      });
+    }
+
+    function renderFlowers() {
+      const list = selectedCategory === "الكل"
+        ? flowers
+        : flowers.filter(item => item.category === selectedCategory);
+
+      gridEl.innerHTML = list.map(item => {
+        const photoOptions = Array.from({ length: 50 }, (_, i) => i + 1)
+          .map(n => `<option value="${n}" ${n === item.photoNum ? "selected" : ""}>صورة رقم ${n}</option>`)
+          .join("");
+
+        return `
+          <div class="card">
+            <img
+              src="${item.src}"
+              alt="${item.ar}"
+              data-idx="0"
+              data-candidates='${JSON.stringify(item.candidates)}'
+              onerror="handleImgError(this)"
+            />
+            <div class="card-body">
+              <span class="category-tag">${item.category}</span>
+              <div class="card-title">${item.ar}</div>
+              <div class="card-en">${item.en}</div>
+              <div class="price">${item.price} ج.م</div>
+              <button class="add-btn" onclick="addToCart('${item.ar.replace(/'/g, "\\'")}')">أضف إلى السلة</button>
+
+              <div class="edit-controls ${editMode ? "show" : ""}">
+                <label>اسم الزهرة / الورقة:</label>
+                <input
+                  type="text"
+                  value="${item.ar.replace(/"/g, "&quot;")}"
+                  placeholder="اكتبي الاسم الصح"
+                  onchange="updateFlowerName(${item.id}, this.value)"
+                />
+                <label>الصورة المرتبطة بالكارت:</label>
+                <select onchange="updateFlowerPhoto(${item.id}, this.value)">
+                  ${photoOptions}
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addToCart(name) {
+      cartCount++;
+      cartEl.textContent = `السلة (${cartCount})`;
+      showToast(`تمت إضافة "${name}" إلى السلة`);
+    }
+
+    renderFilters();
+    renderFlowers();
+  </script>
+</body>
+</html>
